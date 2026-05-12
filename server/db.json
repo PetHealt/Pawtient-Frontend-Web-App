@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "id": "8df6",
+      "clinicId": "1778617377831",
+      "clinicName": "Joselito",
+      "role": "freelancer",
+      "name": "Jose",
+      "email": "jose@gmail.com",
+      "password": "123",
+      "plan": "Paw Pro"
+    }
+  ],
+  "clinics": [],
+  "plans": []
+}
