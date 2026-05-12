@@ -1,14 +1,14 @@
 {
   "users": [
     {
-      "id": "8df6",
-      "clinicId": "1778617377831",
-      "clinicName": "Joselito",
+      "id": "f915",
+      "clinicId": "1778623213890",
+      "clinicName": "SamuelPeth",
       "role": "freelancer",
-      "name": "Jose",
-      "email": "jose@gmail.com",
+      "name": "Gonzalo Samuel Quintanilla Pozo",
+      "email": "gonza1622508@gmail.com",
       "password": "123",
-      "plan": "Paw Pro"
+      "plan": "Paw Basic"
     }
   ],
   "clinics": [],
