@@ -2,24 +2,24 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from './shared/presentation/views/home.vue';
 import PageNotFound from './shared/presentation/views/page-not-found.vue';
 
-// Importamos TODAS las vistas de IAM
+// Importamos las vistas de IAM (Asegúrate que tengan el ./ adelante)
 import Login from './iam/presentation/views/login-view.vue';
 import Register from './iam/presentation/views/register-view.vue';
 import ChoosePlan from './iam/presentation/views/choose-plan-view.vue';
 
-const routes = [
-    // 1. Redirigir siempre al login al abrir la app
-    { path: '/', redirect: '/login' },
+// --- CORRECCIÓN AQUÍ ---
+import ProfileView from './profiles/presentation/views/profile-view.vue';
 
-    // 2. Rutas Públicas (IAM)
+const routes = [
+    { path: '/', redirect: '/login' },
     { path: '/login', component: Login },
     { path: '/register', component: Register },
     { path: '/choose-plan', component: ChoosePlan },
 
-    // 3. Rutas Privadas (Requieren sesión)
+    // Rutas Privadas
     { path: '/home', component: Home },
+    { path: '/profile', component: ProfileView },
 
-    // Cualquier otra ruta que no exista, manda error 404
     { path: '/:pathMatch(.*)*', component: PageNotFound }
 ];
 
@@ -28,18 +28,15 @@ const router = createRouter({
     routes
 });
 
-// Guardián de rutas: Revisa si hay un usuario guardado en localStorage
-router.beforeEach((to, from, next) => {
-    // Estas páginas se pueden ver sin iniciar sesión
+// Guardián de rutas (Se queda igual)
+router.beforeEach((to, from) => {
     const publicPages = ['/login', '/register', '/choose-plan'];
     const authRequired = !publicPages.includes(to.path);
     const loggedIn = localStorage.getItem('currentUser');
 
-    // Si la ruta requiere sesión y no hay usuario logueado, lo patea al login
+    // Si requiere auth y no está logueado, retornamos la ruta de login
     if (authRequired && !loggedIn) {
-        next('/login');
-    } else {
-        next();
+        return '/login';
     }
 });
 
