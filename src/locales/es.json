@@ -1,0 +1,11 @@
+{
+  "home": "Inicio",
+  "profile": "Mi Perfil",
+  "patients": "Pacientes",
+  "appointments": "Agenda",
+  "store": "Almacén",
+  "inventory": "Inventario",
+  "suppliers": "Proveedores",
+  "reports": "Reportes",
+  "logout": "Cerrar Sesión"
+}

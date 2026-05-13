@@ -1,0 +1,11 @@
+{
+  "home": "Home",
+  "profile": "My Profile",
+  "patients": "Patients",
+  "appointments": "Appointments",
+  "store": "Store",
+  "inventory": "Inventory",
+  "suppliers": "Suppliers",
+  "reports": "Reports",
+  "logout": "Log Out"
+}
