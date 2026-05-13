@@ -1,4 +1,10 @@
+/**
+ * It represents a medical or service appointment for a pet
+ */
 export class Appointment {
+   /*
+    *Create a new instance of a quote
+    */
     constructor({
                     id = 0,
                     petName = '',
