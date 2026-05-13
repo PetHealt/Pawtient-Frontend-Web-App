@@ -1,9 +1,24 @@
 <script setup>
 import { authStore } from "../../../iam/application/auth.store.js";
 import { useRouter } from "vue-router";
+import { onMounted } from "vue";
+
+/**
+ * Se corrigió la ruta de importación para subir 3 niveles y encontrar el Store
+ * Esta ruta permite acceder al estado compartido de citas médicas
+ */
+import { appointmentsStore } from "../../../appointments/application/appointments.store.js";
 
 const user = authStore.currentUser;
 const router = useRouter();
+
+/**
+ * Al montar el componente, invocamos la carga de citas desde el db.json
+ * Esto garantiza que el contador de 'Citas Pendientes' sea dinámico y real
+ */
+onMounted(() => {
+  appointmentsStore.loadAppointments();
+});
 
 const goToEdit = () => {
   router.push('/profile');
@@ -64,11 +79,18 @@ const goToEdit = () => {
           <div class="flex justify-content-between mb-3">
             <div>
               <span class="block text-500 font-medium mb-3">Citas Pendientes</span>
-              <div class="text-900 font-bold text-3xl">0</div>
+              <div class="text-900 font-bold text-3xl">
+                {{ appointmentsStore.pendingAppointments?.length || 0 }}
+              </div>
             </div>
             <div class="bg-orange-100 border-round p-2" style="width:2.5rem;height:2.5rem">
               <i class="pi pi-calendar text-orange-500 text-xl"></i>
             </div>
+          </div>
+          <div class="mt-4 pt-3 border-top-1 border-200">
+            <router-link to="/appointments/schedule" class="text-orange-500 font-bold no-underline hover:underline">
+              Ver Agenda Completa <i class="pi pi-arrow-right ml-1"></i>
+            </router-link>
           </div>
         </div>
       </div>

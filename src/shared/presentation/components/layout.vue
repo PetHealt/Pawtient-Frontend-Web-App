@@ -8,13 +8,17 @@ import { authStore } from "../../../iam/application/auth.store.js";
 const route = useRoute();
 const router = useRouter();
 
-// Rutas de Pawtient actualizadas con Mi Perfil
 const items = [
   { label: "Inicio", to: "/home", icon: "pi pi-home" },
   { label: "Mi Perfil", to: "/profile", icon: "pi pi-user" },
   { label: "Pacientes", to: "/clinic/patients", icon: "pi pi-users" },
   { label: "Agenda", to: "/appointments/schedule", icon: "pi pi-calendar" },
-  { label: "Inventario", to: "/store/inventory", icon: "pi pi-box" },
+
+  // SECCIÓN ALMACÉN
+  { label: "Almacén", icon: "pi pi-package", isHeader: true },
+  { label: "Inventario", to: "/store/inventory", icon: "pi pi-box", isSubItem: true },
+  { label: "Proveedores", to: "/store/suppliers", icon: "pi pi-truck", isSubItem: true },
+
   { label: "Reportes", to: "/reports/dashboard", icon: "pi pi-chart-bar" }
 ];
 
@@ -41,16 +45,23 @@ const handleLogout = () => {
       </div>
 
       <nav class="nav-menu">
-        <router-link
-            v-for="item in items"
-            :key="item.label"
-            :to="item.to"
-            class="nav-item"
-            active-class="active-link"
-        >
-          <i :class="item.icon" class="nav-icon"></i>
-          {{ item.label }}
-        </router-link>
+        <template v-for="item in items" :key="item.label">
+          <div v-if="item.isHeader" class="menu-section-header">
+            <i :class="item.icon" class="mr-2"></i>
+            <span>{{ item.label }}</span>
+          </div>
+
+          <router-link
+              v-else
+              :to="item.to"
+              class="nav-item"
+              :class="{ 'sub-item': item.isSubItem }"
+              active-class="active-link"
+          >
+            <i :class="item.icon" class="nav-icon"></i>
+            {{ item.label }}
+          </router-link>
+        </template>
       </nav>
 
       <div class="sidebar-footer">
@@ -199,5 +210,19 @@ const handleLogout = () => {
 .footer {
   background-color: white;
   border-top: 1px solid #e9ecef;
+}
+.menu-section-header {
+  padding: 1.5rem 1.5rem 0.5rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.sub-item {
+  padding-left: 3rem !important;
+  font-size: 0.95rem !important;
 }
 </style>
