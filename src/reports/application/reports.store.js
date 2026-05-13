@@ -14,10 +14,12 @@ export const reportsStore = reactive({
 
     async generateGeneralReport() {
         this.loading = true;
+        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
+            // Filtramos ambas peticiones por clinicId
             const [appRes, invRes] = await Promise.all([
-                reportsApi.fetchAppointments(),
-                reportsApi.fetchInventory()
+                reportsApi.http.get(`${import.meta.env.VITE_APPOINTMENTS_ENDPOINT_PATH}?clinicId=${user.clinicId}`),
+                reportsApi.http.get(`/products?clinicId=${user.clinicId}`)
             ]);
 
             this.appointments = appRes.data;
@@ -33,9 +35,7 @@ export const reportsStore = reactive({
                 lowStockAlerts: alerts,
                 totalAppointments: appRes.data.length
             });
-        } finally {
-            this.loading = false;
-        }
+        } finally { this.loading = false; }
     },
 
     async loadInvoices() {

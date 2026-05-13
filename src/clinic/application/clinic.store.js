@@ -10,12 +10,11 @@ export const clinicStore = reactive({
 
     async loadPets() {
         this.loading = true;
+        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            const response = await clinicApi.getAllPets();
+            const response = await clinicApi.http.get(`/pets?clinicId=${user.clinicId}`);
             this.pets = PetAssembler.toEntitiesFromResources(response.data);
-        } finally {
-            this.loading = false;
-        }
+        } finally { this.loading = false; }
     },
 
     async savePet(petData) {

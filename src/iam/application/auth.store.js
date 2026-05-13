@@ -114,6 +114,16 @@ export const authStore = reactive({
             return false;
         }
     },
+    async deleteUserAccount(id) {
+        try {
+            // authApi hereda de BaseEndpoint, que ya tiene el método delete(id)
+            await authApi.delete(id);
+            return true;
+        } catch (error) {
+            console.error("Error al eliminar usuario:", error);
+            return false;
+        }
+    },
     /**
      * Logs out the current user
      */

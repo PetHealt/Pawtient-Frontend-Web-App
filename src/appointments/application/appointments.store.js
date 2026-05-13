@@ -15,24 +15,25 @@ export const appointmentsStore = reactive({
 
     async loadAppointments() {
         this.loading = true;
+        const user = JSON.parse(localStorage.getItem('currentUser')); //
         try {
-            const response = await appointmentsApi.getAll();
+            // json-server filtra automáticamente usando query params
+            const response = await appointmentsApi.http.get(`${appointmentsApi.endpointPath}?clinicId=${user.clinicId}`);
             this.appointments = AppointmentAssembler.toEntitiesFromResponse(response.data);
         } finally { this.loading = false; }
     },
 
     async saveAppointment(appointmentData) {
-        try {
-            // Si el ID es 0 o no existe, es una creación
-            if (appointmentData.id && appointmentData.id !== 0) {
-                await appointmentsApi.update(appointmentData.id, appointmentData);
-            } else {
-                // Eliminamos el ID 0 para que la DB asigne uno real
-                const { id, ...newData } = appointmentData;
-                await appointmentsApi.create(newData);
-            }
-            await this.loadAppointments();
-        } catch (error) { console.error("Error saving:", error); }
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const dataWithOwnership = { ...appointmentData, clinicId: user.clinicId }; //
+
+        if (dataWithOwnership.id && dataWithOwnership.id !== 0) {
+            await appointmentsApi.update(dataWithOwnership.id, dataWithOwnership);
+        } else {
+            const { id, ...newData } = dataWithOwnership;
+            await appointmentsApi.create(newData);
+        }
+        await this.loadAppointments();
     },
 
     async deleteAppointment(id) {

@@ -35,6 +35,24 @@ const handleSave = async (updatedData) => {
     console.error(error);
   }
 };
+
+// NUEVA FUNCIÓN: Eliminar cuenta
+const removeUser = async () => {
+  const userId = user.value?.id;
+
+  if (!userId) return;
+
+  if (confirm("¿Estás seguro de eliminar tu cuenta permanentemente? Esta acción borrará tu acceso y no se puede deshacer.")) {
+    const success = await authStore.deleteUserAccount(userId);
+
+    if (success) {
+      authStore.logout();
+      router.push('/login');
+    } else {
+      alert("Hubo un error al intentar eliminar la cuenta.");
+    }
+  }
+};
 </script>
 
 <template>
@@ -56,6 +74,17 @@ const handleSave = async (updatedData) => {
 
       <div v-else class="flex justify-content-center p-5">
         <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      </div>
+
+      <div v-if="user" class="mt-8 pt-5 border-top-1 border-200">
+        <h3 class="text-red-500 font-bold mb-3">Zona de Peligro</h3>
+        <p class="text-600 text-sm mb-4">Al eliminar tu cuenta, perderás el acceso al sistema de forma permanente.</p>
+        <pv-button
+            label="Eliminar mi cuenta definitivamente"
+            icon="pi pi-trash"
+            class="p-button-danger p-button-outlined w-full"
+            @click="removeUser"
+        />
       </div>
     </div>
   </div>
