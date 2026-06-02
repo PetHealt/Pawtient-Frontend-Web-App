@@ -19,10 +19,8 @@ onMounted(() => {
 
 const handleSave = async (updatedData) => {
   try {
-    // 1. Mandamos solo los cambios al db.json usando PATCH
     await profilesApi.updateProfile(user.value.id, updatedData);
 
-    // 2. Fusionamos: mantenemos lo que ya había (password, role, etc) y sumamos lo nuevo
     const updatedUser = { ...authStore.currentUser, ...updatedData };
 
     // 3. Guardamos la versión completa en el store y localStorage
@@ -47,7 +45,9 @@ const removeUser = async () => {
 
     if (success) {
       authStore.logout();
-      router.push('/login');
+      // ¡AQUÍ ESTÁ LA CORRECCIÓN!
+      // Destruimos la memoria RAM obligando al navegador a recargar en lugar de usar el router
+      window.location.href = '/login';
     } else {
       alert("Hubo un error al intentar eliminar la cuenta.");
     }
