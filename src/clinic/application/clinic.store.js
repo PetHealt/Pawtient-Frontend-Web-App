@@ -18,10 +18,16 @@ export const clinicStore = reactive({
     },
 
     async savePet(petData) {
-        if (petData.id) {
-            await clinicApi.updatePet(petData.id, petData);
+        // Recuperamos el usuario actual
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        // Le inyectamos su clinicId a la mascota
+        const dataWithOwnership = { ...petData, clinicId: user.clinicId };
+
+        if (dataWithOwnership.id && dataWithOwnership.id !== 0) {
+            await clinicApi.updatePet(dataWithOwnership.id, dataWithOwnership);
         } else {
-            await clinicApi.http.post('/pets', petData); // Usamos POST para nuevos
+            const { id, ...newData } = dataWithOwnership;
+            await clinicApi.http.post('/pets', newData);
         }
         await this.loadPets(); // Refrescar lista
     },
