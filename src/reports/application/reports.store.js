@@ -39,15 +39,19 @@ export const reportsStore = reactive({
     },
 
     async loadInvoices() {
-        const res = await reportsApi.fetchInvoices();
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const res = await reportsApi.fetchInvoices(user.clinicId);
         this.invoices = res.data;
     },
 
     async saveInvoice(invoiceData) {
-        if (invoiceData.id) {
-            await reportsApi.updateInvoice(invoiceData.id, invoiceData);
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const dataWithOwnership = { ...invoiceData, clinicId: user.clinicId };
+
+        if (dataWithOwnership.id) {
+            await reportsApi.updateInvoice(dataWithOwnership.id, dataWithOwnership);
         } else {
-            await reportsApi.createInvoice(invoiceData);
+            await reportsApi.createInvoice(dataWithOwnership);
         }
         await this.loadInvoices();
         await this.generateGeneralReport();
@@ -56,18 +60,27 @@ export const reportsStore = reactive({
     async deleteInvoice(id) {
         await reportsApi.deleteInvoice(id);
         this.invoices = this.invoices.filter(inv => inv.id !== id);
+
+        // CORRECCIÓN: Volvemos a calcular los números del dashboard para que no queden datos fantasma
+        await this.generateGeneralReport();
     },
 
     async emitInvoice(invoiceData) {
-        await reportsApi.createInvoice(invoiceData);
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+
+        const dataWithOwnership = { ...invoiceData, clinicId: user.clinicId };
+
+        await reportsApi.createInvoice(dataWithOwnership);
+
         await this.loadInvoices();
+        await this.generateGeneralReport();
 
         const doc = new jsPDF();
         doc.text("Boleta de Pago - Pawtient", 20, 20);
-        doc.text(`Monto: S/ ${invoiceData.amount}`, 20, 40);
-        doc.text(`Fecha: ${new Date(invoiceData.date).toLocaleDateString()}`, 20, 60);
-        if (invoiceData.petName) doc.text(`Paciente: ${invoiceData.petName}`, 20, 80);
-        if (invoiceData.ownerName) doc.text(`Dueño: ${invoiceData.ownerName}`, 20, 100);
+        doc.text(`Monto: S/ ${dataWithOwnership.amount}`, 20, 40);
+        doc.text(`Fecha: ${new Date(dataWithOwnership.date).toLocaleDateString()}`, 20, 60);
+        if (dataWithOwnership.petName) doc.text(`Paciente: ${dataWithOwnership.petName}`, 20, 80);
+        if (dataWithOwnership.ownerName) doc.text(`Dueño: ${dataWithOwnership.ownerName}`, 20, 100);
         doc.save("Boleta_Pawtient.pdf");
     }
 });
