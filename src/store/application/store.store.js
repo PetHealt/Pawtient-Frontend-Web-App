@@ -14,22 +14,26 @@ export const storeStore = reactive({
     // --- LÓGICA DE INVENTARIO ---
     async loadInventory() {
         this.loading = true;
+        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            const response = await storeApi.getProducts();
+            // Pasamos el clinicId para filtrar
+            const response = await storeApi.getProducts(user.clinicId);
             this.products = ProductAssembler.toEntitiesFromResponse(response.data);
         } finally { this.loading = false; }
     },
 
     async addProduct(productData) {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const dataWithOwnership = { ...productData, clinicId: user.clinicId };
+
         try {
-            // Si el producto tiene ID y no es 0, actualizamos; si no, creamos uno nuevo
-            if (productData.id && productData.id !== 0) {
-                await storeApi.updateProduct(productData.id, productData);
+            if (dataWithOwnership.id && dataWithOwnership.id !== 0) {
+                await storeApi.updateProduct(dataWithOwnership.id, dataWithOwnership);
             } else {
-                const { id, ...newData } = productData;
+                const { id, ...newData } = dataWithOwnership;
                 await storeApi.createProduct(newData);
             }
-            await this.loadInventory(); // Recarga para ver cambios en la tabla
+            await this.loadInventory();
         } catch (error) { console.error("Error saving product:", error); }
     },
 
@@ -45,18 +49,23 @@ export const storeStore = reactive({
     // --- LÓGICA DE PROVEEDORES ---
     async loadSuppliers() {
         this.loading = true;
+        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            const response = await storeApi.getSuppliers();
+            // Pasamos el clinicId para filtrar
+            const response = await storeApi.getSuppliers(user.clinicId);
             this.suppliers = SupplierAssembler.toEntitiesFromResponse(response.data);
         } finally { this.loading = false; }
     },
 
     async addSupplier(supplierData) {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        const dataWithOwnership = { ...supplierData, clinicId: user.clinicId };
+
         try {
-            if (supplierData.id && supplierData.id !== 0) {
-                await storeApi.updateSupplier(supplierData.id, supplierData);
+            if (dataWithOwnership.id && dataWithOwnership.id !== 0) {
+                await storeApi.updateSupplier(dataWithOwnership.id, dataWithOwnership);
             } else {
-                const { id, ...newData } = supplierData;
+                const { id, ...newData } = dataWithOwnership;
                 await storeApi.createSupplier(newData);
             }
             await this.loadSuppliers();
