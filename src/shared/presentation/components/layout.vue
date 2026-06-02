@@ -31,7 +31,7 @@ const isPublicRoute = computed(() => publicRoutes.includes(route.path));
  */
 const handleLogout = () => {
   authStore.logout();
-  router.push("/login");
+  window.location.href = "/login";
 };
 </script>
 
