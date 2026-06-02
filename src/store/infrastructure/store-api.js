@@ -10,14 +10,12 @@ export class StoreApi extends BaseEndpoint {
     }
 
     // --- PRODUCTOS (Inventario) ---
-    getProducts() { return this.http.get(productsPath); }
-    createProduct(data) { return this.http.post(productsPath, data); }
+    getProducts(clinicId) { return this.http.get(`${productsPath}?clinicId=${clinicId}`); }    createProduct(data) { return this.http.post(productsPath, data); }
     updateProduct(id, data) { return this.http.put(`${productsPath}/${id}`, data); }
     deleteProduct(id) { return this.http.delete(`${productsPath}/${id}`); }
 
     // --- PROVEEDORES ---
-    getSuppliers() { return this.http.get(suppliersPath); }
-    createSupplier(data) { return this.http.post(suppliersPath, data); }
+    getSuppliers(clinicId) { return this.http.get(`${suppliersPath}?clinicId=${clinicId}`); }    createSupplier(data) { return this.http.post(suppliersPath, data); }
     updateSupplier(id, data) { return this.http.put(`${suppliersPath}/${id}`, data); }
     deleteSupplier(id) { return this.http.delete(`${suppliersPath}/${id}`); }
 }
