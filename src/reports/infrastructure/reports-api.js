@@ -13,8 +13,7 @@ export class ReportsApi extends BaseEndpoint {
     fetchAppointments() { return this.http.get(appointmentsPath); }
     fetchInventory() { return this.http.get(inventoryPath); }
 
-    fetchInvoices() { return this.http.get(invoicesPath); }
-    createInvoice(data) { return this.http.post(invoicesPath, data); }
+    fetchInvoices(clinicId) { return this.http.get(`${invoicesPath}?clinicId=${clinicId}`); }    createInvoice(data) { return this.http.post(invoicesPath, data); }
     updateInvoice(id, data) { return this.http.put(`${invoicesPath}/${id}`, data); }
     deleteInvoice(id) { return this.http.delete(`${invoicesPath}/${id}`); }
 }
