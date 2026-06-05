@@ -16,14 +16,12 @@ export const reportsStore = reactive({
         this.loading = true;
         const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            // Filtramos ambas peticiones por clinicId
             const [appRes, invRes] = await Promise.all([
                 reportsApi.http.get(`${import.meta.env.VITE_APPOINTMENTS_ENDPOINT_PATH}?clinicId=${user.clinicId}`),
                 reportsApi.http.get(`/products?clinicId=${user.clinicId}`)
             ]);
 
             this.appointments = appRes.data;
-
             const revenue = appRes.data.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
             const expenses = invRes.data.reduce((acc, curr) => acc + (Number(curr.price) * Number(curr.stock) || 0), 0);
             const alerts = invRes.data.filter(p => new Product(p).isLowStock()).length;
@@ -44,43 +42,35 @@ export const reportsStore = reactive({
         this.invoices = res.data;
     },
 
-    async saveInvoice(invoiceData) {
+    // AHORA SOLO REGISTRA EL PAGO
+    async addInvoice(invoiceData) {
         const user = JSON.parse(localStorage.getItem('currentUser'));
         const dataWithOwnership = { ...invoiceData, clinicId: user.clinicId };
 
-        if (dataWithOwnership.id) {
-            await reportsApi.updateInvoice(dataWithOwnership.id, dataWithOwnership);
-        } else {
-            await reportsApi.createInvoice(dataWithOwnership);
-        }
+        await reportsApi.createInvoice(dataWithOwnership);
         await this.loadInvoices();
         await this.generateGeneralReport();
+    },
+
+    // AHORA DESCARGA EL PDF DE MANERA INDEPENDIENTE
+    async downloadInvoicePdf(invoiceId) {
+        const invoice = this.invoices.find(inv => inv.id === invoiceId);
+        if (!invoice) return;
+
+        const doc = new jsPDF();
+        doc.setFontSize(22);
+        doc.text("Boleta de Pago - Pawtient", 20, 20);
+        doc.setFontSize(14);
+        doc.text(`Monto: S/ ${invoice.amount}`, 20, 40);
+        doc.text(`Fecha: ${new Date(invoice.date).toLocaleDateString()}`, 20, 60);
+        doc.text(`Paciente: ${invoice.petName || 'N/A'}`, 20, 80);
+        doc.text(`Dueño: ${invoice.ownerName || 'N/A'}`, 20, 100);
+        doc.save(`Boleta_${invoice.petName || 'Paciente'}.pdf`);
     },
 
     async deleteInvoice(id) {
         await reportsApi.deleteInvoice(id);
         this.invoices = this.invoices.filter(inv => inv.id !== id);
-
-        // CORRECCIÓN: Volvemos a calcular los números del dashboard para que no queden datos fantasma
         await this.generateGeneralReport();
-    },
-
-    async emitInvoice(invoiceData) {
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-
-        const dataWithOwnership = { ...invoiceData, clinicId: user.clinicId };
-
-        await reportsApi.createInvoice(dataWithOwnership);
-
-        await this.loadInvoices();
-        await this.generateGeneralReport();
-
-        const doc = new jsPDF();
-        doc.text("Boleta de Pago - Pawtient", 20, 20);
-        doc.text(`Monto: S/ ${dataWithOwnership.amount}`, 20, 40);
-        doc.text(`Fecha: ${new Date(dataWithOwnership.date).toLocaleDateString()}`, 20, 60);
-        if (dataWithOwnership.petName) doc.text(`Paciente: ${dataWithOwnership.petName}`, 20, 80);
-        if (dataWithOwnership.ownerName) doc.text(`Dueño: ${dataWithOwnership.ownerName}`, 20, 100);
-        doc.save("Boleta_Pawtient.pdf");
     }
 });
