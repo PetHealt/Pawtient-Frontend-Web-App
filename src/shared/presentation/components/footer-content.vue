@@ -1,9 +1,12 @@
 <script setup>
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 </script>
 
 <template>
   <div class="footer-container">
-    <p>© 2026 Pawtient - Sistema de Gestión Veterinaria. Todos los derechos reservados.</p>
+    <p>{{ t('footer.copyright') }}</p>
   </div>
 </template>
 
@@ -16,6 +19,7 @@
   padding: 1rem;
   font-size: 0.9rem;
 }
+
 p {
   margin: 0;
 }

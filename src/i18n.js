@@ -1,20 +1,14 @@
 import { createI18n } from 'vue-i18n';
+import es from './locales/es.json';
+import en from './locales/en.json';
 
-// Mensajes básicos (luego podemos ampliarlos)
-const messages = {
-    en: {
-        welcome: 'Welcome',
-    },
-    es: {
-        welcome: 'Bienvenido',
-    }
-};
+const savedLocale = localStorage.getItem('locale') || 'es';
 
 const i18n = createI18n({
-    legacy: false, // Requerido para usar Vue 3 Composition API (script setup)
-    locale: 'es',  // Idioma por defecto
+    legacy: false,
+    locale: savedLocale,
     fallbackLocale: 'en',
-    messages,
+    messages: { es, en },
 });
 
 export default i18n;

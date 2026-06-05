@@ -2,14 +2,15 @@ import { Profile } from "../domain/model/profile.entity.js";
 
 export class ProfileAssembler {
     static toEntityFromResource(resource) {
+        const [firstName = '', ...lastNameParts] = (resource.fullName ?? '').split(' ');
         return new Profile({
-            id: resource.id,
-            firstName: resource.firstName,
-            lastName: resource.lastName,
+            id: resource.id ?? 0,
+            firstName,
+            lastName: lastNameParts.join(' '),
             email: resource.email,
-            street: resource.street,
-            number: resource.number,
-            city: resource.city
+            clinicName: resource.clinicName,
+            role: resource.role,
+            plan: resource.plan
         });
     }
 }

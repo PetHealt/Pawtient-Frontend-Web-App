@@ -14,45 +14,51 @@ export const reportsStore = reactive({
 
     async generateGeneralReport() {
         this.loading = true;
-        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            const [appRes, invRes] = await Promise.all([
-                reportsApi.http.get(`${import.meta.env.VITE_APPOINTMENTS_ENDPOINT_PATH}?clinicId=${user.clinicId}`),
-                reportsApi.http.get(`/products?clinicId=${user.clinicId}`)
+            const [summaryRes, appointmentsRes, inventoryRes] = await Promise.all([
+                reportsApi.fetchSummary(),
+                reportsApi.fetchAppointments(),
+                reportsApi.fetchInventory()
             ]);
 
-            this.appointments = appRes.data;
-            const revenue = appRes.data.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
-            const expenses = invRes.data.reduce((acc, curr) => acc + (Number(curr.price) * Number(curr.stock) || 0), 0);
-            const alerts = invRes.data.filter(p => new Product(p).isLowStock()).length;
+            const totalIncome = summaryRes.data.totalIncome ?? 0;
+            const inventoryProducts = inventoryRes.data.map(product => new Product(product));
+            const inventoryExpenses = inventoryProducts.reduce((total, product) => {
+                return total + ((Number(product.price) || 0) * (Number(product.stock) || 0));
+            }, 0);
+            const netProfit = totalIncome - inventoryExpenses;
+            const lowStockAlerts = inventoryProducts
+                .filter(product => product.stock < 5)
+                .length;
 
+            this.appointments = appointmentsRes.data;
             this.summary = new ReportSummary({
-                totalRevenue: revenue,
-                totalExpenses: expenses,
-                netProfit: revenue - expenses,
-                lowStockAlerts: alerts,
-                totalAppointments: appRes.data.length
+                totalRevenue: totalIncome,
+                totalExpenses: inventoryExpenses,
+                netProfit,
+                lowStockAlerts,
+                totalAppointments: appointmentsRes.data.length
             });
-        } finally { this.loading = false; }
+        } finally {
+            this.loading = false;
+        }
     },
 
     async loadInvoices() {
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        const res = await reportsApi.fetchInvoices(user.clinicId);
-        this.invoices = res.data;
+        const res = await reportsApi.fetchInvoices();
+        this.invoices = res.data.map(invoice => ({
+            ...invoice,
+            petName: invoice.petName ?? invoice.patient ?? '',
+            ownerName: invoice.ownerName ?? invoice.client ?? ''
+        }));
     },
 
-    // AHORA SOLO REGISTRA EL PAGO
     async addInvoice(invoiceData) {
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        const dataWithOwnership = { ...invoiceData, clinicId: user.clinicId };
-
-        await reportsApi.createInvoice(dataWithOwnership);
+        await reportsApi.createInvoice(invoiceData);
         await this.loadInvoices();
         await this.generateGeneralReport();
     },
 
-    // AHORA DESCARGA EL PDF DE MANERA INDEPENDIENTE
     async downloadInvoicePdf(invoiceId) {
         const invoice = this.invoices.find(inv => inv.id === invoiceId);
         if (!invoice) return;
@@ -69,8 +75,12 @@ export const reportsStore = reactive({
     },
 
     async deleteInvoice(id) {
-        await reportsApi.deleteInvoice(id);
-        this.invoices = this.invoices.filter(inv => inv.id !== id);
-        await this.generateGeneralReport();
+        try {
+            await reportsApi.deleteInvoice(id);
+            this.invoices = this.invoices.filter(inv => inv.id !== id);
+            await this.generateGeneralReport();
+        } catch (error) {
+            console.error("El backend no tiene endpoint para eliminar facturas:", error);
+        }
     }
 });

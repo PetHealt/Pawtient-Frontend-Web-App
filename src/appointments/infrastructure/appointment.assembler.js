@@ -1,18 +1,25 @@
 import { Appointment } from "../domain/model/appointment.entity.js";
 
+const backendToFrontendStatus = {
+    Pendiente: 'scheduled',
+    Completada: 'completed',
+    Cancelada: 'cancelled'
+};
+
 export class AppointmentAssembler {
-    /**
-     * @param {Object} resource
-     * @returns {Appointment}
-     */
     static toEntityFromResource(resource) {
-        return new Appointment(resource);
+        return new Appointment({
+            id: resource.id,
+            petName: resource.petName ?? resource.patient ?? '',
+            ownerName: resource.ownerName ?? resource.owner ?? '',
+            date: resource.date,
+            time: resource.time,
+            status: backendToFrontendStatus[resource.status] ?? resource.status ?? 'scheduled',
+            reason: resource.reason ?? '',
+            amount: resource.amount ?? 0
+        });
     }
 
-    /**
-     * @param {Array} resources
-     * @returns {Array<Appointment>}
-     */
     static toEntitiesFromResponse(resources) {
         return resources.map(resource => this.toEntityFromResource(resource));
     }

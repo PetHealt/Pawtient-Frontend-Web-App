@@ -10,26 +10,21 @@ export const clinicStore = reactive({
 
     async loadPets() {
         this.loading = true;
-        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            const response = await clinicApi.http.get(`/pets?clinicId=${user.clinicId}`);
+            const response = await clinicApi.getAllPets();
             this.pets = PetAssembler.toEntitiesFromResources(response.data);
-        } finally { this.loading = false; }
+        } finally {
+            this.loading = false;
+        }
     },
 
     async savePet(petData) {
-        // Recuperamos el usuario actual
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        // Le inyectamos su clinicId a la mascota
-        const dataWithOwnership = { ...petData, clinicId: user.clinicId };
-
-        if (dataWithOwnership.id && dataWithOwnership.id !== 0) {
-            await clinicApi.updatePet(dataWithOwnership.id, dataWithOwnership);
+        if (petData.id && petData.id !== 0) {
+            await clinicApi.updatePet(petData.id, petData);
         } else {
-            const { id, ...newData } = dataWithOwnership;
-            await clinicApi.http.post('/pets', newData);
+            await clinicApi.createPet(petData);
         }
-        await this.loadPets(); // Refrescar lista
+        await this.loadPets();
     },
 
     async deletePet(id) {

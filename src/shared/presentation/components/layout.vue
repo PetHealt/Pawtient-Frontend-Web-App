@@ -2,33 +2,27 @@
 import LanguageSwitcher from "./language-switcher.vue";
 import FooterContent from "./footer-content.vue";
 import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { authStore } from "../../../iam/application/auth.store.js";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
-const router = useRouter();
+const { t } = useI18n();
 
 const items = [
-  { label: "Inicio", to: "/home", icon: "pi pi-home" },
-  { label: "Mi Perfil", to: "/profile", icon: "pi pi-user" },
-  { label: "Pacientes", to: "/clinic/patients", icon: "pi pi-users" },
-  { label: "Agenda", to: "/appointments/schedule", icon: "pi pi-calendar" },
-
-  // SECCIÓN ALMACÉN
-  { label: "Almacén", icon: "pi pi-package", isHeader: true },
-  { label: "Inventario", to: "/store/inventory", icon: "pi pi-box", isSubItem: true },
-  { label: "Proveedores", to: "/store/suppliers", icon: "pi pi-truck", isSubItem: true },
-
-  { label: "Reportes", to: "/reports/dashboard", icon: "pi pi-chart-bar" }
+  { labelKey: "navigation.home", to: "/home", icon: "pi pi-home" },
+  { labelKey: "navigation.profile", to: "/profile", icon: "pi pi-user" },
+  { labelKey: "navigation.patients", to: "/clinic/patients", icon: "pi pi-users" },
+  { labelKey: "navigation.appointments", to: "/appointments/schedule", icon: "pi pi-calendar" },
+  { labelKey: "navigation.store", icon: "pi pi-package", isHeader: true },
+  { labelKey: "navigation.inventory", to: "/store/inventory", icon: "pi pi-box", isSubItem: true },
+  { labelKey: "navigation.suppliers", to: "/store/suppliers", icon: "pi pi-truck", isSubItem: true },
+  { labelKey: "navigation.reports", to: "/reports/dashboard", icon: "pi pi-chart-bar" }
 ];
 
-// Rutas públicas donde no se debe ver el menú lateral
 const publicRoutes = ["/login", "/register", "/choose-plan", "/"];
 const isPublicRoute = computed(() => publicRoutes.includes(route.path));
 
-/**
- * Gestiona el cierre de sesión limpiando el almacenamiento local
- */
 const handleLogout = () => {
   authStore.logout();
   window.location.href = "/login";
@@ -37,7 +31,6 @@ const handleLogout = () => {
 
 <template>
   <div class="app-layout">
-
     <aside v-if="!isPublicRoute" class="sidebar">
       <div class="logo-section">
         <i class="pi pi-verified" style="font-size: 2rem; margin-right: 0.5rem;"></i>
@@ -45,10 +38,10 @@ const handleLogout = () => {
       </div>
 
       <nav class="nav-menu">
-        <template v-for="item in items" :key="item.label">
+        <template v-for="item in items" :key="item.labelKey">
           <div v-if="item.isHeader" class="menu-section-header">
             <i :class="item.icon" class="mr-2"></i>
-            <span>{{ item.label }}</span>
+            <span>{{ t(item.labelKey) }}</span>
           </div>
 
           <router-link
@@ -59,7 +52,7 @@ const handleLogout = () => {
               active-class="active-link"
           >
             <i :class="item.icon" class="nav-icon"></i>
-            {{ item.label }}
+            {{ t(item.labelKey) }}
           </router-link>
         </template>
       </nav>
@@ -69,7 +62,7 @@ const handleLogout = () => {
           <language-switcher />
           <button @click="handleLogout" class="logout-btn">
             <i class="pi pi-power-off"></i>
-            <span>Cerrar Sesión</span>
+            <span>{{ t('navigation.logout') }}</span>
           </button>
         </div>
       </div>
@@ -84,19 +77,16 @@ const handleLogout = () => {
         <footer-content />
       </footer>
     </div>
-
   </div>
 </template>
 
 <style scoped>
-/* Contenedor global */
 .app-layout {
   display: flex;
   min-height: 100vh;
   background-color: #f8f9fa;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 250px;
   background-color: #3b82f6;
@@ -156,7 +146,6 @@ const handleLogout = () => {
   font-weight: bold;
 }
 
-/* FOOTER DEL SIDEBAR */
 .sidebar-footer {
   padding: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -172,7 +161,7 @@ const handleLogout = () => {
 .logout-btn {
   width: 100%;
   padding: 0.8rem;
-  background-color: #ef4444; /* Rojo para logout */
+  background-color: #ef4444;
   color: white;
   border: none;
   border-radius: 8px;
@@ -189,7 +178,6 @@ const handleLogout = () => {
   background-color: #dc2626;
 }
 
-/* CONTENIDO PRINCIPAL */
 .main-wrapper {
   margin-left: 250px;
   flex-grow: 1;
@@ -211,6 +199,7 @@ const handleLogout = () => {
   background-color: white;
   border-top: 1px solid #e9ecef;
 }
+
 .menu-section-header {
   padding: 1.5rem 1.5rem 0.5rem;
   font-size: 0.8rem;

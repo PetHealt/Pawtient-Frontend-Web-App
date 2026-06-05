@@ -7,13 +7,10 @@ const profilesApi = new ProfilesApi();
 export const profilesStore = reactive({
     currentProfile: null,
 
-    async loadProfile(email) {
+    async loadProfile() {
         try {
-            const response = await profilesApi.getProfileByEmail(email);
-            // Asumiendo que la API devuelve un array y tomamos el primero
-            if (response.data.length > 0) {
-                this.currentProfile = ProfileAssembler.toEntityFromResource(response.data[0]);
-            }
+            const response = await profilesApi.getProfile();
+            this.currentProfile = ProfileAssembler.toEntityFromResource(response.data);
         } catch (error) {
             console.error("Error cargando el perfil:", error);
         }

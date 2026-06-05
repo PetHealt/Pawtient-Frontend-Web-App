@@ -1,5 +1,6 @@
 <script setup>
 import { Profile } from "../../domain/model/profile.entity.js";
+import { useI18n } from "vue-i18n";
 
 defineProps({
   profile: {
@@ -7,6 +8,8 @@ defineProps({
     required: true
   }
 });
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -14,22 +17,22 @@ defineProps({
     <div class="info-row">
       <i class="pi pi-user"></i>
       <div>
-        <label>Nombre Completo</label>
+        <label>{{ t('profile.fullName') }}</label>
         <p>{{ profile.fullName }}</p>
       </div>
     </div>
     <div class="info-row">
       <i class="pi pi-envelope"></i>
       <div>
-        <label>Correo Electrónico</label>
+        <label>{{ t('common.email') }}</label>
         <p>{{ profile.email }}</p>
       </div>
     </div>
     <div class="info-row">
       <i class="pi pi-building"></i>
       <div>
-        <label>Clínica / Negocio</label>
-        <p>{{ profile.clinicName || 'No especificado' }}</p>
+        <label>{{ t('profile.clinicName') }}</label>
+        <p>{{ profile.clinicName || t('profile.unspecified') }}</p>
       </div>
     </div>
   </div>

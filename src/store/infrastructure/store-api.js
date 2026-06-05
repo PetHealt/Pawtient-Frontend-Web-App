@@ -9,13 +9,51 @@ export class StoreApi extends BaseEndpoint {
         super(new BaseApi(), "");
     }
 
-    // --- PRODUCTOS (Inventario) ---
-    getProducts(clinicId) { return this.http.get(`${productsPath}?clinicId=${clinicId}`); }    createProduct(data) { return this.http.post(productsPath, data); }
-    updateProduct(id, data) { return this.http.put(`${productsPath}/${id}`, data); }
-    deleteProduct(id) { return this.http.delete(`${productsPath}/${id}`); }
+    getProducts() {
+        return this.http.get(productsPath);
+    }
 
-    // --- PROVEEDORES ---
-    getSuppliers(clinicId) { return this.http.get(`${suppliersPath}?clinicId=${clinicId}`); }    createSupplier(data) { return this.http.post(suppliersPath, data); }
-    updateSupplier(id, data) { return this.http.put(`${suppliersPath}/${id}`, data); }
-    deleteSupplier(id) { return this.http.delete(`${suppliersPath}/${id}`); }
+    createProduct(data) {
+        return this.http.post(productsPath, this.toBackendProduct(data));
+    }
+
+    updateProduct(id, data) {
+        return this.http.put(`${productsPath}/${id}`, this.toBackendProduct(data));
+    }
+
+    deleteProduct(id) {
+        return this.http.delete(`${productsPath}/${id}`);
+    }
+
+    getSuppliers() {
+        return this.http.get(suppliersPath);
+    }
+
+    createSupplier(data) {
+        return this.http.post(suppliersPath, this.toBackendSupplier(data));
+    }
+
+    updateSupplier(id, data) {
+        return this.http.put(`${suppliersPath}/${id}`, this.toBackendSupplier(data));
+    }
+
+    deleteSupplier(id) {
+        return this.http.delete(`${suppliersPath}/${id}`);
+    }
+
+    toBackendProduct(data) {
+        return {
+            name: data.name,
+            stock: Number(data.stock) || 0,
+            price: Number(data.price) || 0
+        };
+    }
+
+    toBackendSupplier(data) {
+        return {
+            companyName: data.companyName ?? data.name,
+            contact: data.contact ?? '',
+            category: data.category ?? ''
+        };
+    }
 }

@@ -1,76 +1,127 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { storeStore } from "../../application/store.store.js";
+import { useI18n } from "vue-i18n";
 
 const displayDialog = ref(false);
-const supplier = ref({ id: 0, name: '', contact: '', category: '' });
+const supplier = ref({ id: 0, companyName: '', contact: '', category: '' });
+const { t } = useI18n();
 
 onMounted(() => storeStore.loadSuppliers());
 
 const openNew = () => {
-  supplier.value = { id: 0, name: '', contact: '', category: '' };
+  supplier.value = { id: 0, companyName: '', contact: '', category: '' };
   displayDialog.value = true;
 };
 
-const openEdit = (data) => {
+const editSupplier = (data) => {
   supplier.value = { ...data };
   displayDialog.value = true;
 };
 
-const saveSupplier = async () => {
-  if (supplier.value.name.trim()) {
-    await storeStore.addSupplier(supplier.value);
-    displayDialog.value = false;
+const confirmDelete = async (id) => {
+  if (confirm(t('suppliers.confirmDelete'))) {
+    await storeStore.deleteSupplier(id);
   }
 };
 
-const confirmDelete = async (id) => {
-  if (confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
-    await storeStore.deleteSupplier(id);
-  }
+const handleSave = async () => {
+  await storeStore.addSupplier(supplier.value);
+  displayDialog.value = false;
 };
 </script>
 
 <template>
-  <div class="surface-card p-5 shadow-2 border-round">
-    <div class="flex justify-content-between align-items-center mb-4">
-      <h2 class="text-3xl font-bold m-0 text-900">Mis Proveedores</h2>
-      <pv-button label="Nuevo Proveedor" icon="pi pi-user-plus" class="p-button-success" @click="openNew" />
+  <div class="p-4 lg:p-6">
+    <div class="clinic-card">
+      <div class="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center mb-5 gap-3">
+        <div>
+          <h1 class="text-3xl font-bold m-0 text-gray-800">{{ t('suppliers.title') }}</h1>
+          <p class="text-gray-500 m-0 mt-1">{{ t('suppliers.subtitle') }}</p>
+        </div>
+        <pv-button :label="t('suppliers.new')" icon="pi pi-plus" class="btn-primary-clinic" @click="openNew" />
+      </div>
+
+      <pv-data-table :value="storeStore.suppliers" :loading="storeStore.loading" stripedRows class="clinic-table">
+        <template #empty> <div class="p-4 text-center text-gray-500">{{ t('suppliers.empty') }}</div> </template>
+
+        <pv-column field="companyName" :header="t('suppliers.company')" sortable class="font-bold text-gray-800"></pv-column>
+        <pv-column field="contact" :header="t('suppliers.contact')"></pv-column>
+        <pv-column field="category" :header="t('suppliers.category')">
+          <template #body="slotProps">
+            <span class="bg-gray-100 text-gray-600 px-3 py-1 border-round-2xl text-sm font-semibold border-1 border-gray-300">
+              {{ slotProps.data.category || t('common.general') }}
+            </span>
+          </template>
+        </pv-column>
+
+        <pv-column :header="t('common.actions')" fixed="right">
+          <template #body="slotProps">
+            <div class="flex gap-2">
+              <pv-button icon="pi pi-pencil" class="p-button-rounded p-button-text text-blue-500 hover:surface-200" @click="editSupplier(slotProps.data)" />
+              <pv-button icon="pi pi-trash" class="p-button-rounded p-button-text text-red-500 hover:surface-200" @click="confirmDelete(slotProps.data.id)" />
+            </div>
+          </template>
+        </pv-column>
+      </pv-data-table>
     </div>
 
-    <pv-data-table :value="storeStore.suppliers" :loading="storeStore.loading" stripedRows>
-      <pv-column field="name" header="Empresa" class="font-bold"></pv-column>
-      <pv-column field="contact" header="Contacto"></pv-column>
-      <pv-column field="category" header="Categoría"></pv-column>
-      <pv-column header="Acciones">
-        <template #body="slotProps">
-          <div class="flex gap-2">
-            <pv-button icon="pi pi-pencil" class="p-button-text p-button-warning" @click="openEdit(slotProps.data)" />
-            <pv-button icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDelete(slotProps.data.id)" />
+    <pv-dialog v-model:visible="displayDialog" modal appendTo="body" :draggable="false" :closable="false" :style="{width: '450px'}" class="clinic-dialog">
+      <template #header>
+        <div class="flex align-items-center justify-content-between w-full pb-2">
+          <div class="flex align-items-center gap-3">
+            <div class="bg-blue-50 p-2 border-round-lg flex align-items-center justify-content-center">
+              <i class="pi pi-truck text-blue-600 text-xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 m-0">{{ supplier.id ? t('suppliers.edit') : t('suppliers.new') }}</h2>
           </div>
-        </template>
-      </pv-column>
-    </pv-data-table>
+          <button @click="displayDialog = false" class="p-link w-2rem h-2rem flex align-items-center justify-content-center border-circle hover:surface-100 transition-colors cursor-pointer border-none bg-transparent text-gray-500">
+            <i class="pi pi-times text-lg"></i>
+          </button>
+        </div>
+      </template>
 
-    <pv-dialog v-model:visible="displayDialog" :header="supplier.id ? 'Editar Proveedor' : 'Registrar Proveedor'" modal :style="{width: '450px'}">
-      <div class="flex flex-column gap-3 mt-2">
-        <div class="field">
-          <label class="font-bold">Nombre de la Empresa</label>
-          <pv-input-text v-model="supplier.name" class="w-full" />
+      <div class="grid formgrid pt-3">
+        <div class="col-12 mb-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">{{ t('suppliers.companyName') }}</label>
+          <pv-input-text v-model="supplier.companyName" :placeholder="t('suppliers.companyPlaceholder')" class="clinic-input" />
         </div>
-        <div class="field">
-          <label class="font-bold">Contacto (Tel/Email)</label>
-          <pv-input-text v-model="supplier.contact" class="w-full" />
+        <div class="col-12 mb-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">{{ t('suppliers.contact') }}</label>
+          <pv-input-text v-model="supplier.contact" :placeholder="t('suppliers.contactPlaceholder')" class="clinic-input" />
         </div>
-        <div class="field">
-          <label class="font-bold">Giro/Categoría</label>
-          <pv-input-text v-model="supplier.category" class="w-full" />
+        <div class="col-12 mb-2">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">{{ t('suppliers.categoryLabel') }}</label>
+          <pv-input-text v-model="supplier.category" :placeholder="t('suppliers.categoryPlaceholder')" class="clinic-input" />
         </div>
       </div>
+
       <template #footer>
-        <pv-button label="Cerrar" icon="pi pi-times" class="p-button-text" @click="displayDialog = false" />
-        <pv-button label="Registrar" icon="pi pi-check" class="p-button-success" @click="saveSupplier" />
+        <div class="flex justify-content-end gap-3 pt-3">
+          <pv-button :label="t('common.cancel')" class="p-button-text text-gray-500 hover:text-gray-800 font-semibold transition-colors p-2" @click="displayDialog = false" />
+          <pv-button :label="t('suppliers.save')" icon="pi pi-check" class="btn-primary-clinic" @click="handleSave" />
+        </div>
       </template>
     </pv-dialog>
   </div>
 </template>
+
+<style scoped>
+.clinic-card { background-color: #ffffff; padding: 2rem; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+.btn-primary-clinic { background-color: #2563eb !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; padding: 0.75rem 1.5rem !important; transition: background-color 0.2s, transform 0.1s !important; }
+.btn-primary-clinic:hover { background-color: #1d4ed8 !important; transform: translateY(-1px) !important; }
+:deep(.clinic-table .p-datatable-header) { background: transparent; }
+:deep(.clinic-table .p-datatable-thead > tr > th) { background-color: #f8fafc !important; color: #475569 !important; border-bottom: 2px solid #e2e8f0 !important; padding: 1rem; }
+:deep(.clinic-table .p-datatable-tbody > tr) { background-color: #ffffff !important; color: #334155 !important; transition: background 0.2s; }
+:deep(.clinic-table .p-datatable-tbody > tr:hover) { background-color: #f8fafc !important; }
+:deep(.clinic-table .p-datatable-tbody > tr > td) { border-bottom: 1px solid #e2e8f0 !important; padding: 1rem; }
+</style>
+
+<style>
+.p-dialog-mask { background-color: rgba(15, 23, 42, 0.45) !important; backdrop-filter: blur(3px); }
+.clinic-dialog { background-color: #ffffff !important; border-radius: 16px !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2) !important; border: none !important; padding: 1rem !important; }
+.clinic-dialog .p-dialog-header, .clinic-dialog .p-dialog-content, .clinic-dialog .p-dialog-footer { background-color: transparent !important; color: #1f2937 !important; }
+.clinic-input, .clinic-input-num { width: 100% !important; }
+.clinic-dialog .p-inputtext, .clinic-dialog .p-inputnumber-input, .clinic-dialog .p-select, .clinic-dialog .p-dropdown { width: 100% !important; background-color: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: #334155 !important; border-radius: 8px !important; padding: 0.8rem 1rem !important; font-size: 0.95rem !important; transition: all 0.2s ease !important; box-shadow: none !important; }
+.clinic-dialog .p-inputtext:focus, .clinic-dialog .p-select.p-focus, .clinic-dialog .p-dropdown.p-focus { background-color: #ffffff !important; border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important; outline: none !important; }
+</style>

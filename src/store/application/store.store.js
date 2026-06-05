@@ -1,4 +1,3 @@
-// src/store/application/store.store.js
 import { reactive } from "vue";
 import { StoreApi } from "../infrastructure/store-api.js";
 import { ProductAssembler } from "../infrastructure/product.assembler.js";
@@ -11,65 +10,60 @@ export const storeStore = reactive({
     suppliers: [],
     loading: false,
 
-    // --- LÓGICA DE INVENTARIO ---
     async loadInventory() {
         this.loading = true;
-        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            // Pasamos el clinicId para filtrar
-            const response = await storeApi.getProducts(user.clinicId);
+            const response = await storeApi.getProducts();
             this.products = ProductAssembler.toEntitiesFromResponse(response.data);
-        } finally { this.loading = false; }
+        } finally {
+            this.loading = false;
+        }
     },
 
     async addProduct(productData) {
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        const dataWithOwnership = { ...productData, clinicId: user.clinicId };
-
         try {
-            if (dataWithOwnership.id && dataWithOwnership.id !== 0) {
-                await storeApi.updateProduct(dataWithOwnership.id, dataWithOwnership);
+            if (productData.id && productData.id !== 0) {
+                await storeApi.updateProduct(productData.id, productData);
             } else {
-                const { id, ...newData } = dataWithOwnership;
-                await storeApi.createProduct(newData);
+                await storeApi.createProduct(productData);
             }
             await this.loadInventory();
-        } catch (error) { console.error("Error saving product:", error); }
+        } catch (error) {
+            console.error("Error saving product:", error);
+        }
     },
 
     async deleteProduct(id) {
         if (!id || id === 0) return;
         try {
             await storeApi.deleteProduct(id);
-            // Filtro local para respuesta inmediata
             this.products = this.products.filter(p => p.id !== id);
-        } catch (error) { console.error("Error deleting product:", error); }
+        } catch (error) {
+            console.error("Error deleting product:", error);
+        }
     },
 
-    // --- LÓGICA DE PROVEEDORES ---
     async loadSuppliers() {
         this.loading = true;
-        const user = JSON.parse(localStorage.getItem('currentUser'));
         try {
-            // Pasamos el clinicId para filtrar
-            const response = await storeApi.getSuppliers(user.clinicId);
+            const response = await storeApi.getSuppliers();
             this.suppliers = SupplierAssembler.toEntitiesFromResponse(response.data);
-        } finally { this.loading = false; }
+        } finally {
+            this.loading = false;
+        }
     },
 
     async addSupplier(supplierData) {
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        const dataWithOwnership = { ...supplierData, clinicId: user.clinicId };
-
         try {
-            if (dataWithOwnership.id && dataWithOwnership.id !== 0) {
-                await storeApi.updateSupplier(dataWithOwnership.id, dataWithOwnership);
+            if (supplierData.id && supplierData.id !== 0) {
+                await storeApi.updateSupplier(supplierData.id, supplierData);
             } else {
-                const { id, ...newData } = dataWithOwnership;
-                await storeApi.createSupplier(newData);
+                await storeApi.createSupplier(supplierData);
             }
             await this.loadSuppliers();
-        } catch (error) { console.error("Error saving supplier:", error); }
+        } catch (error) {
+            console.error("Error saving supplier:", error);
+        }
     },
 
     async deleteSupplier(id) {
@@ -77,6 +71,8 @@ export const storeStore = reactive({
         try {
             await storeApi.deleteSupplier(id);
             this.suppliers = this.suppliers.filter(s => s.id !== id);
-        } catch (error) { console.error("Error deleting supplier:", error); }
+        } catch (error) {
+            console.error("Error deleting supplier:", error);
+        }
     }
 });

@@ -1,12 +1,14 @@
 <script setup>
 import { ref } from 'vue';
+import { useI18n } from "vue-i18n";
 
 const emit = defineEmits(['register-requested']);
 const name = ref('');
 const email = ref('');
 const password = ref('');
 const role = ref('admin');
-const clinicName = ref(''); // Nuevo campo para el nombre del negocio
+const clinicName = ref('');
+const { t } = useI18n();
 
 function submitRegister() {
   emit('register-requested', {
@@ -14,8 +16,8 @@ function submitRegister() {
     email: email.value,
     password: password.value,
     role: role.value,
-    clinicName: clinicName.value, // Enviamos el nombre
-    clinicId: Date.now().toString() // Conservamos el ID interno para la BD, pero oculto al usuario
+    clinicName: clinicName.value,
+    clinicId: Date.now().toString()
   });
 }
 </script>
@@ -23,28 +25,28 @@ function submitRegister() {
 <template>
   <form @submit.prevent="submitRegister" class="custom-form">
     <div class="form-group">
-      <label for="name">Nombre Completo</label>
-      <input id="name" v-model="name" type="text" required placeholder="Ej. Dr. Carlos Pérez" />
+      <label for="name">{{ t('auth.fullName') }}</label>
+      <input id="name" v-model="name" type="text" required :placeholder="t('auth.fullNamePlaceholder')" />
     </div>
 
     <div class="form-group">
-      <label for="email">Correo Electrónico</label>
-      <input id="email" v-model="email" type="email" required placeholder="correo@veterinaria.com" />
+      <label for="email">{{ t('auth.email') }}</label>
+      <input id="email" v-model="email" type="email" required :placeholder="t('auth.emailPlaceholder')" />
     </div>
 
     <div class="form-group">
-      <label for="password">Contraseña</label>
+      <label for="password">{{ t('auth.password') }}</label>
       <input id="password" v-model="password" type="password" required placeholder="••••••••" />
     </div>
 
     <div class="role-selection">
-      <label class="role-title">¿Cómo usarás Pawtient?</label>
+      <label class="role-title">{{ t('auth.useQuestion') }}</label>
 
       <label class="radio-card" :class="{ 'active': role === 'admin' }">
         <input type="radio" value="admin" v-model="role" />
         <div class="radio-content">
           <i class="pi pi-building"></i>
-          <span>Soy Dueño/Admin de Clínica</span>
+          <span>{{ t('auth.clinicOwner') }}</span>
         </div>
       </label>
 
@@ -52,24 +54,23 @@ function submitRegister() {
         <input type="radio" value="freelancer" v-model="role" />
         <div class="radio-content">
           <i class="pi pi-user"></i>
-          <span>Soy Veterinario Independiente</span>
+          <span>{{ t('auth.freelancer') }}</span>
         </div>
       </label>
     </div>
 
     <div class="form-group" style="margin-top: 0.5rem;">
-      <label for="clinicName">Nombre de tu Clínica o Emprendimiento</label>
-      <input id="clinicName" v-model="clinicName" type="text" required placeholder="Ej. Veterinaria San Roque" />
+      <label for="clinicName">{{ t('auth.clinicName') }}</label>
+      <input id="clinicName" v-model="clinicName" type="text" required :placeholder="t('auth.clinicNamePlaceholder')" />
     </div>
 
     <button type="submit" class="submit-btn">
-      Crear Cuenta
+      {{ t('auth.createAccount') }}
     </button>
   </form>
 </template>
 
 <style scoped>
-/* Pega aquí exactamente el mismo <style scoped> que tenías en este archivo antes. No cambia nada del CSS. */
 .custom-form { display: flex; flex-direction: column; gap: 1.2rem; width: 100%; }
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .form-group label { color: #4b5563; font-weight: 600; font-size: 0.95rem; }

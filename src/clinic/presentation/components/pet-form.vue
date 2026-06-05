@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   visible: Boolean,
@@ -8,6 +9,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save']);
 const localPet = ref({ name: '', type: '', breed: '', age: 0 });
+const { t } = useI18n();
 
 watch(() => props.pet, (newPet) => {
   if (newPet) {
@@ -35,15 +37,13 @@ const onSave = () => {
       :style="{ width: '450px' }"
       class="clinic-dialog"
   >
-    <!-- CABECERA PERSONALIZADA -->
     <template #header>
       <div class="flex align-items-center justify-content-between w-full pb-2">
         <div class="flex align-items-center gap-3">
           <div class="bg-blue-50 p-2 border-round-lg flex align-items-center justify-content-center">
-            <!-- Icono de huella de mascota (Heart/Star como alternativa si no hay paw) -->
             <i class="pi pi-heart-fill text-blue-600 text-xl"></i>
           </div>
-          <h2 class="text-xl font-bold text-gray-800 m-0">{{ localPet.id ? 'Editar Paciente' : 'Nuevo Paciente' }}</h2>
+          <h2 class="text-xl font-bold text-gray-800 m-0">{{ localPet.id ? t('patients.editPatient') : t('patients.newPatient') }}</h2>
         </div>
         <button @click="emit('close')" class="p-link w-2rem h-2rem flex align-items-center justify-content-center border-circle hover:surface-100 transition-colors cursor-pointer border-none bg-transparent text-gray-500">
           <i class="pi pi-times text-lg"></i>
@@ -53,43 +53,38 @@ const onSave = () => {
 
     <div class="grid formgrid pt-3">
       <div class="col-12 mb-4">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de la Mascota</label>
-        <pv-input-text v-model="localPet.name" placeholder="Ej: Max" class="clinic-input" />
+        <label class="block text-sm font-semibold text-gray-700 mb-2">{{ t('patients.petNameLabel') }}</label>
+        <pv-input-text v-model="localPet.name" :placeholder="t('patients.petNamePlaceholder')" class="clinic-input" />
       </div>
 
       <div class="col-12 md:col-6 mb-4">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Especie</label>
-        <pv-input-text v-model="localPet.type" placeholder="Ej: Perro" class="clinic-input" />
+        <label class="block text-sm font-semibold text-gray-700 mb-2">{{ t('patients.species') }}</label>
+        <pv-input-text v-model="localPet.type" :placeholder="t('patients.speciesPlaceholder')" class="clinic-input" />
       </div>
 
       <div class="col-12 md:col-6 mb-4">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Raza</label>
-        <pv-input-text v-model="localPet.breed" placeholder="Ej: Labrador" class="clinic-input" />
+        <label class="block text-sm font-semibold text-gray-700 mb-2">{{ t('patients.breed') }}</label>
+        <pv-input-text v-model="localPet.breed" :placeholder="t('patients.breedPlaceholder')" class="clinic-input" />
       </div>
 
       <div class="col-12 mb-2">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Edad (Años)</label>
-        <!-- Forzamos el input-number a ser del 100% del ancho para que no se rompa -->
-        <pv-input-number v-model="localPet.age" class="clinic-input-num" :min="0" suffix=" años" />
+        <label class="block text-sm font-semibold text-gray-700 mb-2">{{ t('patients.ageYears') }}</label>
+        <pv-input-number v-model="localPet.age" class="clinic-input-num" :min="0" :suffix="` ${t('common.years')}`" />
       </div>
     </div>
 
-    <!-- FOOTER PERSONALIZADO -->
     <template #footer>
       <div class="flex justify-content-end gap-3 pt-3 mt-1">
-        <pv-button label="Cancelar" class="p-button-text text-gray-500 hover:text-gray-800 font-semibold transition-colors p-2" @click="emit('close')" />
-        <pv-button label="Guardar Paciente" icon="pi pi-check" class="btn-primary-clinic" @click="onSave" />
+        <pv-button :label="t('common.cancel')" class="p-button-text text-gray-500 hover:text-gray-800 font-semibold transition-colors p-2" @click="emit('close')" />
+        <pv-button :label="t('patients.savePatient')" icon="pi pi-check" class="btn-primary-clinic" @click="onSave" />
       </div>
     </template>
   </pv-dialog>
 </template>
 
-<!-- NO USAMOS SCOPED PARA QUE EL DIÁLOGO FLOTANTE (appendTo="body") TOME LOS ESTILOS -->
 <style>
-/* Fondo oscuro suave detrás del modal */
 .p-dialog-mask { background-color: rgba(15, 23, 42, 0.45) !important; backdrop-filter: blur(3px); }
 
-/* Modal Pawtient Blanco */
 .clinic-dialog {
   background-color: #ffffff !important;
   border-radius: 16px !important;
@@ -102,12 +97,8 @@ const onSave = () => {
   color: #1f2937 !important;
 }
 
-/* ========================================================
-   SOLUCIÓN A LOS INPUTS
-   ======================================================== */
 .clinic-input, .clinic-input-num { width: 100% !important; }
 
-/* Inputs internos */
 .clinic-dialog .p-inputtext,
 .clinic-dialog .p-inputnumber-input {
   width: 100% !important;
@@ -128,7 +119,6 @@ const onSave = () => {
   outline: none !important;
 }
 
-/* Botón Principal Pawtient */
 .btn-primary-clinic {
   background-color: #2563eb !important;
   border: none !important;

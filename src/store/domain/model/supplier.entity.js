@@ -1,7 +1,8 @@
 export class Supplier {
-    constructor({ id = "", name = "", contact = "", category = "" } = {}) {
+    constructor({ id = "", name = "", companyName = "", contact = "", category = "" } = {}) {
         this.id = id;
-        this.name = name;
+        this.companyName = companyName || name;
+        this.name = name || companyName;
         this.contact = contact;
         this.category = category;
     }
