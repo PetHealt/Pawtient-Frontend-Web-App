@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const platformApi = import.meta.env.VITE_API_BASE_URL;
+const productionApi = "https://pawtient-api-emi25-2026-asgxedgbh8aegrdt.eastus2-01.azurewebsites.net/api/v1";
+const configuredApi = import.meta.env.VITE_API_BASE_URL;
+const platformApi = configuredApi && !configuredApi.includes("pawtient-fake-api")
+    ? configuredApi
+    : productionApi;
 
 export class BaseApi {
     #http;
