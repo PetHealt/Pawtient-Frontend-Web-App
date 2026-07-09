@@ -33,9 +33,9 @@ function submitLogin() {
 <style scoped>
 .custom-form { display: flex; flex-direction: column; gap: 1.5rem; width: 100%; }
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
-.form-group label { color: #4b5563; font-weight: 600; font-size: 0.95rem; }
-.form-group input { padding: 0.8rem 1rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
-.form-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
-.submit-btn { width: 100%; padding: 1rem; background-color: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: background-color 0.2s; display: flex; justify-content: center; align-items: center; }
-.submit-btn:hover { background-color: #1d4ed8; }
+.form-group label { color: #334155; font-weight: 700; font-size: 0.95rem; }
+.form-group input { padding: 0.9rem 1rem; border: 1px solid #d1dce8; border-radius: 8px; font-size: 1rem; color: #17233c; background: #f8fbff; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; outline: none; }
+.form-group input:focus { background: #ffffff; border-color: #2f80ed; box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.14); }
+.submit-btn { width: 100%; padding: 1rem; background: linear-gradient(135deg, #1d6ce3, #1455d9); color: white; border: none; border-radius: 8px; font-size: 1.05rem; font-weight: 750; cursor: pointer; margin-top: 1rem; transition: transform 0.2s, box-shadow 0.2s; display: flex; justify-content: center; align-items: center; box-shadow: 0 12px 22px rgba(29, 108, 227, 0.24); }
+.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(29, 108, 227, 0.3); }
 </style>

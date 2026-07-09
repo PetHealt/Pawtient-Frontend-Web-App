@@ -84,12 +84,16 @@ const handleLogout = () => {
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(245, 248, 252, 0.55)),
+    #f4f8fc;
 }
 
 .sidebar {
   width: 250px;
-  background-color: #3b82f6;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)),
+    linear-gradient(160deg, #1666df 0%, #1d6ce3 50%, #16a3a3 100%);
   color: white;
   position: fixed;
   top: 0;
@@ -97,23 +101,40 @@ const handleLogout = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  box-shadow: 10px 0 30px rgba(20, 85, 217, 0.14);
   z-index: 1000;
+  overflow: hidden;
+}
+
+.sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  pointer-events: none;
+  opacity: 0.18;
 }
 
 .logo-section {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 2rem 1.5rem;
+  padding: 1.75rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .logo-section h2 {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
 }
 
 .nav-menu {
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 1rem 0;
@@ -124,11 +145,15 @@ const handleLogout = () => {
   padding: 1rem 1.5rem;
   color: white;
   text-decoration: none;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 650;
   display: flex;
   align-items: center;
-  transition: background-color 0.2s, border-left 0.2s;
+  transition: background-color 0.2s, border-left 0.2s, transform 0.2s;
   border-left: 4px solid transparent;
+  margin: 0.15rem 0.65rem;
+  border-radius: 8px;
+  padding-left: 1rem;
 }
 
 .nav-icon {
@@ -137,16 +162,19 @@ const handleLogout = () => {
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.13);
+  transform: translateX(2px);
 }
 
 .active-link {
   background-color: rgba(255, 255, 255, 0.2);
   border-left: 4px solid #ffffff;
   font-weight: bold;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
 .sidebar-footer {
+  position: relative;
   padding: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -161,7 +189,7 @@ const handleLogout = () => {
 .logout-btn {
   width: 100%;
   padding: 0.8rem;
-  background-color: #ef4444;
+  background: linear-gradient(135deg, #f15f5f, #e33f4d);
   color: white;
   border: none;
   border-radius: 8px;
@@ -171,11 +199,13 @@ const handleLogout = () => {
   justify-content: center;
   gap: 0.5rem;
   font-weight: bold;
-  transition: background-color 0.2s;
+  box-shadow: 0 10px 18px rgba(227, 63, 77, 0.22);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .logout-btn:hover {
-  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 22px rgba(227, 63, 77, 0.28);
 }
 
 .main-wrapper {
@@ -192,26 +222,43 @@ const handleLogout = () => {
 
 .main-content {
   flex-grow: 1;
-  padding: 2rem;
+  padding: 2.25rem;
 }
 
 .footer {
-  background-color: white;
-  border-top: 1px solid #e9ecef;
+  background-color: rgba(255, 255, 255, 0.82);
+  border-top: 1px solid #dbe5f1;
+  backdrop-filter: blur(10px);
 }
 
 .menu-section-header {
-  padding: 1.5rem 1.5rem 0.5rem;
+  position: relative;
+  padding: 1.5rem 1.5rem 0.45rem;
   font-size: 0.8rem;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.72);
   font-weight: bold;
   display: flex;
   align-items: center;
+  letter-spacing: 0;
 }
 
 .sub-item {
-  padding-left: 3rem !important;
+  padding-left: 2.8rem !important;
   font-size: 0.95rem !important;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .main-wrapper {
+    margin-left: 220px;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
 }
 </style>
